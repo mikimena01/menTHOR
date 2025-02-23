@@ -7,10 +7,12 @@ from ibm_watson_machine_learning.metanames import GenTextParamsMetaNames as GenP
 from ibm_watson_machine_learning.foundation_models.utils.enums import DecodingMethods
 import warnings
 
+from ibm_watsonx_ai.metanames import EmbedTextParamsMetaNames
 from langchain.chains.retrieval_qa.base import RetrievalQA
-from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_community.embeddings import HuggingFaceEmbeddings, SentenceTransformerEmbeddings
 from langchain_community.vectorstores import FAISS
 from langchain_core.prompts import PromptTemplate
+from langchain_ibm import WatsonxEmbeddings
 
 from menTHOR import settings
 
@@ -45,19 +47,38 @@ from langchain.vectorstores import SQLiteVSS
     connection=connection,  # Passa la connessione al database
     table_name="document_vectors"  # Nome della tabella per i vettori
 )'''
-'''loader = PDFPlumberLoader('/Users/michelemenabeni/PycharmProjects/menTHOR/templates/documents/ibm_annual_report_2023.pdf')
-documents = loader.load()
+#loader = PDFPlumberLoader('/Users/michelemenabeni/PycharmProjects/menTHOR/templates/documents/ibm_annual_report_2023.pdf')
+#documents = loader.load()
 
-text_splitter = CharacterTextSplitter(chunk_size=1000, chunk_overlap=0)
-texts = text_splitter.split_documents(documents)
-
-emb_func = HuggingFaceEmbeddings(model_name="ibm-granite/granite-embedding-107m-multilingual")
+#text_splitter = CharacterTextSplitter(chunk_size=1000, chunk_overlap=0)
+#texts = text_splitter.split_documents(documents)
+embed_params = {
+    EmbedTextParamsMetaNames.TRUNCATE_INPUT_TOKENS: 3,
+    EmbedTextParamsMetaNames.RETURN_OPTIONS: {"input_text": True},
+}
+emb_func = WatsonxEmbeddings(
+    model_id="ibm/slate-125m-english-rtrvr",
+    url="https://us-south.ml.cloud.ibm.com",
+    project_id=wxa_project_id,
+    params=embed_params,
+    apikey = wxa_api_key,
+)
+#emb_func = HuggingFaceEmbeddings(model_name="ibm-granite/granite-embedding-107m-multilingual")
 # Percorso al database SQLite di Django
-vectorstore = FAISS.from_documents(documents=texts, embedding=emb_func)
+#vectorstore = FAISS.from_documents(documents=texts, embedding=emb_func)
 
-vectorstore.save_local("faiss_index")'''
-emb_func = HuggingFaceEmbeddings(model_name="ibm-granite/granite-embedding-107m-multilingual")
-
+#vectorstore.save_local("faiss_index")
+'''embed_params = {
+    EmbedTextParamsMetaNames.TRUNCATE_INPUT_TOKENS: 3,
+    EmbedTextParamsMetaNames.RETURN_OPTIONS: {"input_text": True},
+}
+emb_func = WatsonxEmbeddings(
+    model_id="ibm/slate-125m-english-rtrvr",
+    url="https://us-south.ml.cloud.ibm.com",
+    project_id=wxa_project_id,
+    params=embed_params,
+    apikey = wxa_api_key,
+)'''
 parameters = {
         GenParams.DECODING_METHOD: DecodingMethods.GREEDY,
         GenParams.MIN_NEW_TOKENS: 1,
@@ -79,7 +100,7 @@ def get_answer(query):
 
 
     #watsonx_llm = WatsonxLLM(model=model)
-    emb_func = HuggingFaceEmbeddings(model_name="ibm-granite/granite-embedding-107m-multilingual")
+    #emb_func = HuggingFaceEmbeddings(model_name="ibm-granite/granite-embedding-107m-multilingual")
 
     #results = vectorstore.similarity_search(query, k=3)
     prompt_template = PromptTemplate(

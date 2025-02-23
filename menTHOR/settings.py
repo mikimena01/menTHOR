@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 import os
 from pathlib import Path
 
+from dotenv import load_dotenv
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -25,7 +27,8 @@ SECRET_KEY = 'django-insecure-*1ia_x)%o&)d1%#z7i!_-zrvtdc%&92o%g4!f*_%+(=)t+pok5
 #DEBUG = os.environ.get('DEBUG', '0').lower() in ['true', 't', '1']
 #ALLOWED_HOSTS = os.environ.get('ALLOWED_HOSTS', '').split()
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
+
 
 ALLOWED_HOSTS = ['127.0.0.1', 'menthor.onrender.com']
 
@@ -86,7 +89,8 @@ DATABASES = {
         'NAME': BASE_DIR / "db.sqlite3",
     }
 }
-STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
+load_dotenv()
+#STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 wxa_api_key = os.getenv("WXA_API_KEY", "default")
 wxa_project_id = os.getenv("WXA_PROJECT_ID", "default")
 
